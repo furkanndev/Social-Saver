@@ -1,0 +1,9 @@
+# Social Saver — Dependencies
+flask>=3.1.0
+flask-cors>=6.0.0
+requests>=2.32.0
+beautifulsoup4>=4.13.0
+pywebview>=6.0.0
+browser-cookie3>=0.20.0
+pillow>=11.0.0
+pycryptodomex>=3.20.0

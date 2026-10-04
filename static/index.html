@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Social Saver — Instagram Story & HD Profil Fotoğrafı İndirici</title>
+  <meta name="description" content="Instagram açık profillerin story'lerini anonim olarak kaydedin ve profil fotoğraflarını en yüksek kalitede görüntüleyip indirin.">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="logo-area" onclick="location.reload()">
+      <div class="logo-icon">
+        <i class="fa-brands fa-instagram"></i>
+      </div>
+      <div class="logo-text">
+        <h1>Social Saver</h1>
+        <span>Story & HD Profil Aracı</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Quick Login Button -->
+      <button class="btn btn-primary" id="headerAutoLoginBtn" onclick="openLoginModal('session')" style="font-size: 12.5px; padding: 7px 14px;">
+        <i class="fa-brands fa-instagram"></i> <span id="headerAutoLoginText">Giriş Yap</span>
+      </button>
+
+      <!-- Session Status Pill -->
+      <div class="status-pill" id="sessionStatusPill" onclick="openLoginModal('session')">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="sessionStatusText">Giriş Yap</span>
+      </div>
+
+      <!-- Settings Button -->
+      <button class="btn btn-secondary btn-icon" title="Ayarlar ve Önbellek Yönetimi" onclick="openSettingsModal('cache')">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main>
+    
+    <!-- Hero & Search Section -->
+    <section class="hero-section">
+      <div class="hero-tag">
+        <i class="fa-solid fa-bolt"></i> %100 Anonim • Giriş Gerekmez • Orijinal Kalite
+      </div>
+      <h2 class="hero-title">
+        Instagram <span class="gradient-text">Story & HD Profil</span> İndirici
+      </h2>
+      <p class="hero-subtitle">
+        Açık profillerin 24 saatlik story'lerini <strong>hiçbir giriş yapmadan veya hesap bağlamadan</strong> karşı tarafa "görüldü" gitmeden izleyin ve indirin. Profil fotoğraflarını sıkıştırmasız <strong>Full HD</strong> çözünürlükte görüntüleyin.
+      </p>
+
+      <!-- Search Box -->
+      <div class="search-wrapper">
+        <form id="searchForm" onsubmit="handleSearch(event)" class="search-box">
+          <span class="search-prefix">@</span>
+          <input 
+            type="text" 
+            id="usernameInput" 
+            class="search-input" 
+            placeholder="Kullanıcı adı girin (örn: natgeo, cristiano, nasa)..." 
+            autocomplete="off" 
+            required
+          >
+          <button type="submit" class="btn btn-primary search-btn" id="searchSubmitBtn">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Sorgula</span>
+          </button>
+        </form>
+
+        <!-- Quick Tags -->
+        <div class="quick-tags" id="quickTagsContainer">
+          <span class="quick-tags-label">Örnekler:</span>
+          <span class="quick-tag" onclick="quickSearch('natgeo')">natgeo</span>
+          <span class="quick-tag" onclick="quickSearch('nasa')">nasa</span>
+          <span class="quick-tag" onclick="quickSearch('instagram')">instagram</span>
+          <span class="quick-tag" onclick="quickSearch('cristiano')">cristiano</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Info Banner (Guarantees) -->
+    <div class="info-banner">
+      <div class="info-banner-content">
+        <i class="fa-solid fa-shield-halved info-banner-icon"></i>
+        <span><strong>Gizlilik Koruması:</strong> Hikayeler doğrudan CDN üzerinden çekilir. Instagram'ın izleme servisine sinyal gönderilmez, hikaye sahibi izlediğinizi göremez.</span>
+      </div>
+      <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 12px;" onclick="openModal('settingsModal')">
+        <i class="fa-solid fa-circle-question"></i> Nasıl Çalışır?
+      </button>
+    </div>
+
+    <!-- Favorites Bar (Saved Profiles) -->
+    <div id="favoritesBar" style="display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 8px 14px; margin-bottom: 8px; background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.22); border-radius: 12px;">
+      <div style="display: flex; align-items: center; gap: 10px; overflow-x: auto; flex: 1;">
+        <span style="font-size: 12.5px; color: #f59e0b; font-weight: 700; white-space: nowrap; display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-star"></i> Favorilerim (<span id="favoritesCountBadge">0</span>):
+        </span>
+        <div id="favoritesItems" style="display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding: 2px 0;"></div>
+      </div>
+    </div>
+
+    <!-- History / Bookmarks Bar (If any) -->
+    <div id="historyBar" style="display: none; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px;">
+      <div style="display: flex; align-items: center; gap: 10px; overflow-x: auto; flex: 1;">
+        <span style="font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap;"><i class="fa-solid fa-clock-rotate-left"></i> Son Aramalar:</span>
+        <div id="historyItems" style="display: flex; gap: 8px; flex-wrap: nowrap;"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="clearSearchHistory()" style="padding: 3px 10px; font-size: 11px; white-space: nowrap; color: var(--text-muted); border-color: rgba(255,255,255,0.1);" title="Arama geçmişini temizle">
+        <i class="fa-solid fa-trash-can"></i> Temizle
+      </button>
+    </div>
+
+    <!-- Profile Section (Hidden until searched) -->
+    <section class="profile-card" id="profileCard" style="display: none;">
+      <div class="profile-header">
+        <div class="profile-info-group">
+          <!-- Avatar with HD Badge -->
+          <div class="avatar-wrapper" onclick="openHdProfileModal()" title="HD Profil Fotoğrafını Büyüt">
+            <div class="avatar-ring" id="profileAvatarRing">
+              <img id="profileAvatar" src="" alt="Avatar" class="avatar-img">
+            </div>
+            <div class="avatar-hd-badge">
+              <i class="fa-solid fa-expand"></i> HD
+            </div>
+            <div class="avatar-lock-badge" id="avatarLockBadge" style="display: none;" title="Kilitli Hesap">
+              <i class="fa-solid fa-lock"></i>
+            </div>
+          </div>
+
+          <!-- Profile Details -->
+          <div class="profile-details">
+            <div class="profile-name-row">
+              <span class="profile-username" id="profileUsername"></span>
+              <i class="fa-solid fa-circle-check verified-badge" id="profileVerified" style="display: none;" title="Doğrulanmış Hesap"></i>
+              <span id="profilePrivateBadge" class="badge-locked" style="display: none;">
+                <i class="fa-solid fa-lock"></i> Kilitli Profil
+              </span>
+            </div>
+            <div class="profile-fullname" id="profileFullName"></div>
+            <p class="profile-bio" id="profileBio"></p>
+
+            <!-- Stats -->
+            <div class="profile-stats">
+              <div class="stat-item">
+                <span class="stat-val" id="profilePostsCount">0</span>
+                <span class="stat-label">Gönderi</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val" id="profileFollowers">0</span>
+                <span class="stat-label">Takipçi</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-val" id="profileFollowing">0</span>
+                <span class="stat-label">Takip</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Actions -->
+        <div class="profile-actions">
+          <button class="btn btn-primary" onclick="openHdProfileModal()">
+            <i class="fa-solid fa-expand"></i> HD Fotoğrafı Gör
+          </button>
+          <a class="btn btn-success" id="profileCardDlBtn" href="#" download>
+            <i class="fa-solid fa-download"></i> HD İndir (.JPG)
+          </a>
+          <button class="btn btn-secondary" id="favToggleBtn" onclick="toggleFavoriteCurrent()">
+            <i class="fa-regular fa-bookmark"></i> Favorilere Ekle
+          </button>
+        </div>
+      </div>
+
+      <!-- Private Profile Notice Banner (Shown only when profile is private) -->
+      <div class="private-profile-banner" id="privateProfileBanner" style="display: none;">
+        <div class="private-banner-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <div class="private-banner-body">
+          <div class="private-banner-title">
+            <span>Kilitli Profil (Gizli Hesap)</span>
+            <span class="private-pill"><i class="fa-solid fa-shield-halved"></i> Gizli İçerik</span>
+          </div>
+          <p class="private-banner-desc">
+            Bu profil gizli olarak ayarlanmıştır. Instagram gizlilik politikası uyarınca hikayeler ve öne çıkanlar kapalıdır.
+            <strong>Orijinal Full HD profil fotoğrafını yukarıdaki "HD İndir" butonundan indirebilir veya fotoğrafın üzerine tıklayarak tam boyutta inceleyebilirsiniz.</strong>
+          </p>
+          <div style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="openHdProfileModal()" style="font-size: 12.5px; padding: 6px 14px;">
+              <i class="fa-solid fa-expand"></i> HD Profil Fotoğrafını Tam Ekranda Gör
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Private Profile HD Showcase (Direct Large Image Preview for Locked Accounts) -->
+      <div id="privateHdShowcase" style="display: none; margin-top: 14px;">
+        <div class="private-hd-showcase">
+          <div class="showcase-header">
+            <div class="showcase-title-wrap">
+              <div class="showcase-icon"><i class="fa-solid fa-circle-user"></i></div>
+              <div>
+                <h3>Gizli Profil Fotoğrafı (Full HD)</h3>
+                <p>Kilitli hesapların profil fotoğrafı orijinal en yüksek çözünürlükte görüntülenebilir.</p>
+              </div>
+            </div>
+            <div class="showcase-badge">
+              <i class="fa-solid fa-circle-check"></i> HD Hazır
+            </div>
+          </div>
+
+          <div class="showcase-card">
+            <div class="showcase-img-container" onclick="openHdProfileModal()" title="Tam Boyutta Büyüt">
+              <div class="showcase-img-wrapper">
+                <img id="privateShowcaseImg" src="" alt="Gizli Profil Fotoğrafı">
+                <div class="showcase-img-overlay">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                  <span>Büyük Halini Gör</span>
+                </div>
+              </div>
+              <div class="showcase-res-tag">
+                <i class="fa-solid fa-image"></i> <span id="privateShowcaseDims">HD Profil Fotoğrafı</span>
+              </div>
+            </div>
+
+            <div class="showcase-details">
+              <div class="showcase-info-row">
+                <div class="info-chip">
+                  <i class="fa-solid fa-lock" style="color: #f87171;"></i>
+                  <span>Hesap: <strong style="color: #fca5a5;">Gizli Profil</strong></span>
+                </div>
+                <div class="info-chip">
+                  <i class="fa-solid fa-file-image"></i>
+                  <span>Format: <strong>JPG (Full HD)</strong></span>
+                </div>
+              </div>
+              <p class="showcase-note">
+                Profil gizli olsa dahi profil fotoğrafı tam çözünürlükte görüntülenebilir ve orijinal kalitede indirilebilir.
+              </p>
+              <div class="showcase-btn-group">
+                <button class="btn btn-primary" onclick="openHdProfileModal()">
+                  <i class="fa-solid fa-expand"></i> Tam Ekranda İncele (HD)
+                </button>
+                <a class="btn btn-success" id="privateShowcaseDlBtn" href="#" download>
+                  <i class="fa-solid fa-download"></i> HD Fotoğrafı İndir (.JPG)
+                </a>
+                <button class="btn btn-secondary" onclick="copyProfileHdLink()">
+                  <i class="fa-solid fa-link"></i> Bağlantıyı Kopyala
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Pinned Highlights Tray (Instagram Story Rings) -->
+      <div class="pinned-highlights-container" id="pinnedHighlightsContainer" style="display: none;">
+        <div class="pinned-highlights-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-boxes-stacked" style="color: var(--accent-pink);"></i>
+            <span>Profile Sabitlenen Hikayeler</span>
+          </div>
+          <span class="pinned-count-badge" id="pinnedHighlightsBadge">0</span>
+        </div>
+        <div class="pinned-highlights-tray" id="pinnedHighlightsTray"></div>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="content-tabs">
+        <button class="tab-btn active" id="tabStoriesBtn" onclick="switchTab('stories')">
+          <i class="fa-solid fa-circle-play"></i> Hikayeler (Stories)
+          <span class="tab-badge" id="storiesCountBadge">0</span>
+        </button>
+        <button class="tab-btn" id="tabPostsBtn" onclick="switchTab('posts')">
+          <i class="fa-solid fa-table-cells"></i> Gönderiler (Posts)
+          <span class="tab-badge" id="postsCountBadge">0</span>
+        </button>
+        <button class="tab-btn" id="tabProfilePicBtn" onclick="switchTab('profilepic')">
+          <i class="fa-solid fa-circle-user"></i> HD Profil Fotoğrafı
+        </button>
+      </div>
+
+      <!-- Tab 1: Stories Container -->
+      <div id="storiesTabContent">
+        <div class="stories-header">
+          <div class="stories-title">
+            <span>Aktif Hikayeler</span>
+            <span style="font-size: 13px; font-weight: 400; color: var(--text-muted);" id="storiesSubtext"></span>
+          </div>
+          <div class="stories-actions" id="storiesActions" style="display: none;">
+            <button class="btn btn-success" onclick="downloadAllStoriesZip()">
+              <i class="fa-solid fa-file-zipper"></i> Tümünü İndir (.ZIP)
+            </button>
+          </div>
+        </div>
+
+        <!-- Stories Grid -->
+        <div class="stories-grid" id="storiesGrid"></div>
+
+        <!-- Stories Empty State -->
+        <div class="empty-state" id="storiesEmpty" style="display: none;">
+          <div class="empty-icon"><i class="fa-solid fa-camera"></i></div>
+          <div class="empty-title">Aktif Story Bulunamadı</div>
+          <div class="empty-desc">Bu kullanıcının son 24 saat içinde paylaştığı aktif bir hikaye bulunmuyor.</div>
+          <div style="display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; justify-content: center;">
+            <button class="btn btn-primary" onclick="switchTab('posts')" id="goToPostsFromStoriesBtn">
+              <i class="fa-solid fa-table-cells"></i> Gönderileri Görüntüle
+            </button>
+            <button class="btn btn-secondary" onclick="openHdProfileModal()">
+              <i class="fa-solid fa-circle-user"></i> HD Profil Fotoğrafını Görüntüle & İndir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: HD Profile Picture Showcase (For Public Profiles) -->
+      <div id="profilePicTabContent" style="display: none;">
+        <div class="private-hd-showcase" style="display: block; margin-top: 0;">
+          <div class="showcase-header">
+            <div class="showcase-title-wrap">
+              <div class="showcase-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+              <div>
+                <h3>HD Profil Fotoğrafı Vitrini</h3>
+                <p>Orijinal Instagram sunucularından alınan en yüksek kalite (1080p) profil fotoğrafı</p>
+              </div>
+            </div>
+            <div class="showcase-badge">
+              <i class="fa-solid fa-circle-check"></i> Orijinal Çözünürlük
+            </div>
+          </div>
+
+          <div class="showcase-card">
+            <div class="showcase-img-container" onclick="openHdProfileModal()" title="Tam Boyutta Büyüt">
+              <div class="showcase-img-wrapper">
+                <img id="publicShowcaseImg" src="" alt="HD Profil Fotoğrafı">
+                <div class="showcase-img-overlay">
+                  <i class="fa-solid fa-magnifying-glass-plus"></i>
+                  <span>Tam Ekranda Gör</span>
+                </div>
+              </div>
+              <div class="showcase-res-tag">
+                <i class="fa-solid fa-image"></i> <span id="publicShowcaseDims">HD Profil Fotoğrafı</span>
+              </div>
+            </div>
+
+            <div class="showcase-details">
+              <div class="showcase-info-row">
+                <div class="info-chip">
+                  <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
+                  <span>Hesap Durumu: <strong id="publicShowcasePrivacy">Herkese Açık</strong></span>
+                </div>
+                <div class="info-chip">
+                  <i class="fa-solid fa-file-image"></i>
+                  <span>Format: <strong>JPG (En Yüksek Kalite)</strong></span>
+                </div>
+              </div>
+              <p class="showcase-note">
+                Profil fotoğrafı doğrudan Instagram CDN sunucularından Full HD (1080×1080) olarak temin edilmiştir.
+              </p>
+              <div class="showcase-btn-group">
+                <button class="btn btn-primary" onclick="openHdProfileModal()">
+                  <i class="fa-solid fa-expand"></i> Tam Boyut İncele (HD)
+                </button>
+                <a class="btn btn-success" id="publicShowcaseDlBtn" href="#" download>
+                  <i class="fa-solid fa-download"></i> HD Fotoğrafı İndir (.JPG)
+                </a>
+                <button class="btn btn-secondary" onclick="copyProfileHdLink()">
+                  <i class="fa-solid fa-link"></i> Bağlantıyı Kopyala
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Posts Feed Container (For Public Profiles) -->
+      <div id="postsTabContent" style="display: none;">
+        <div class="stories-header">
+          <div class="stories-title">
+            <span>Profil Gönderileri (Feed)</span>
+            <span style="font-size: 13px; font-weight: 400; color: var(--text-muted);" id="postsSubtext"></span>
+          </div>
+          <div class="stories-actions" id="postsActions" style="display: none;">
+            <button class="btn btn-success" id="downloadAllPostsBtn" onclick="openDownloadAllPostsModal()" title="Oturum açıkken kullanıcının tüm gönderilerini ZIP olarak indir">
+              <i class="fa-solid fa-file-zipper"></i> Tüm Gönderileri İndir (.ZIP)
+            </button>
+          </div>
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="posts-grid" id="postsGrid"></div>
+
+        <!-- Posts Pagination & Load More Container -->
+        <div id="postsLoadMoreContainer" style="display: none; flex-direction: column; align-items: center; justify-content: center; margin: 32px 0 20px; gap: 14px;">
+          <div id="postsProgressInfo" style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+            <i class="fa-solid fa-layer-group" style="color: var(--accent-pink);"></i> <span id="postsLoadedStats">12 gönderi görüntülendi</span>
+          </div>
+
+          <!-- Official Session Load More Button -->
+          <button class="btn btn-primary" id="postsLoadMoreBtn" onclick="loadMorePosts()" style="padding: 10px 28px; font-size: 13.5px; border-radius: 24px; display: none;">
+            <i class="fa-solid fa-arrows-rotate"></i> Daha Fazla Gönderi Yükle
+          </button>
+
+          <!-- Anonymous Mode Session Prompt Card (When more posts exist) -->
+          <div id="postsAnonymousNotice" style="display: none; max-width: 580px; width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px dashed rgba(245, 158, 11, 0.35); border-radius: var(--radius-md); padding: 14px 18px; text-align: center; color: var(--text-secondary); font-size: 12.5px;">
+            <p style="margin-bottom: 8px;">
+              <i class="fa-solid fa-circle-info" style="color: #f59e0b;"></i> 
+              Anonim modda ilk 12 gönderi başarıyla gösterildi. Kalan tüm gönderileri (<span id="postsRemainingCount"></span>) kesintisiz yüklemek için hesabınızı bağlayabilirsiniz:
+            </p>
+            <button class="btn btn-primary" onclick="openLoginModal()" style="padding: 6px 16px; font-size: 12px; border-radius: 20px;">
+              <i class="fa-brands fa-instagram"></i> Hesabınla Giriş Yap & Kalan Gönderileri Aç
+            </button>
+          </div>
+        </div>
+
+        <!-- Posts Empty State -->
+        <div class="empty-state" id="postsEmpty" style="display: none;">
+          <div class="empty-icon"><i class="fa-solid fa-images"></i></div>
+          <div class="empty-title">Gönderi Bulunamadı</div>
+          <div class="empty-desc">Bu kullanıcının henüz bir gönderisi bulunmuyor veya hesap gizli.</div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Welcome / Getting Started Guide (Shown when no profile loaded) -->
+    <section id="welcomeGuide" class="empty-state" style="padding: 48px 24px;">
+      <div class="empty-icon"><i class="fa-brands fa-instagram" style="color: var(--accent-pink);"></i></div>
+      <h3 class="empty-title">Story & HD Profil İndirmeye Başlayın</h3>
+      <p class="empty-desc">
+        Yukarıdaki arama çubuğuna dilediğiniz açık Instagram profilinin adını yazın. Hikayeleri anında izleyebilir, tek tek veya topluca indirebilir, profil fotoğrafını tam çözünürlükte görüntüleyebilirsiniz.
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; width: 100%; max-width: 800px; margin-top: 24px; text-align: left;">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div class="step-content">
+            <h4>HD Profil Fotoğrafı</h4>
+            <p>Sıkıştırmasız 1080p orijinal boyutta görüntüleyin ve tek tıkla cihazınıza kaydedin.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div class="step-content">
+            <h4>24 Saatlik Story'ler</h4>
+            <p>Aktif fotoğraf ve videoları oynatın, MP4 ve JPEG formatında tam kalitede indirin.</p>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div class="step-content">
+            <h4>%100 Gizli & Güvenli</h4>
+            <p>İzlediğiniz hiçbir içerik için 'Görüldü' işareti gitmez. Tamamen anonimdir.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: HD Profile Picture Lightbox -->
+  <div class="modal-backdrop" id="hdProfileModal">
+    <div class="modal-container hd-lightbox-container" id="hdLightboxContainer">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-circle-user" style="color: var(--accent-pink);"></i>
+          <span id="hdModalTitle">HD Profil Fotoğrafı</span>
+        </div>
+        <div class="hd-modal-controls">
+          <button class="btn btn-secondary btn-icon" title="Yakınlaştır (+)" onclick="zoomProfilePic(0.25)">
+            <i class="fa-solid fa-magnifying-glass-plus"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon" title="Uzaklaştır (-)" onclick="zoomProfilePic(-0.25)">
+            <i class="fa-solid fa-magnifying-glass-minus"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon" title="Orijinal Boyut (1:1)" onclick="resetProfilePicZoom()">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </button>
+          <button class="btn btn-secondary btn-icon" id="hdModalFullscreenBtn" title="Tam Ekran Modu" onclick="toggleProfilePicFullscreen()">
+            <i class="fa-solid fa-expand"></i>
+          </button>
+          <button class="modal-close-btn" onclick="closeModal('hdProfileModal')" title="Kapat">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body hd-profile-modal-body">
+        <div class="hd-img-container" id="hdImgContainer" title="Büyütmek için çift tıklayın veya fare tekerleğini kullanın">
+          <img id="hdModalImg" src="" alt="HD Profile Pic" class="hd-img-preview" draggable="false">
+        </div>
+        <div class="hd-img-meta-row">
+          <span class="hd-res-badge"><i class="fa-solid fa-image"></i> <span id="hdImageDims">1080 × 1080 Full HD</span></span>
+          <span class="hd-zoom-badge" id="hdZoomBadge"><i class="fa-solid fa-magnifying-glass"></i> %100</span>
+          <span class="hd-source-badge"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Orijinal Meta CDN</span>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="copyProfileHdLink()">
+          <i class="fa-solid fa-link"></i> Bağlantıyı Kopyala
+        </button>
+        <a class="btn btn-secondary" id="hdOpenNewTabBtn" href="#" target="_blank">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Yeni Sekmede Aç
+        </a>
+        <a id="hdDownloadBtn" href="#" class="btn btn-primary" download>
+          <i class="fa-solid fa-download"></i> Orijinal HD İndir (.JPG)
+        </a>
+        <button class="btn btn-secondary" onclick="closeModal('hdProfileModal')">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Fullscreen Story Player -->
+  <div class="modal-backdrop" id="storyPlayerModal">
+    <div class="story-player-modal">
+      
+      <!-- Top Segments Progress Bar -->
+      <div class="story-progress-bar-container" id="playerProgressContainer"></div>
+
+      <!-- Player Header -->
+      <div class="story-player-header">
+        <div class="story-player-user">
+          <img id="playerUserAvatar" src="" class="story-player-avatar" alt="Avatar">
+          <div>
+            <div class="story-player-username" id="playerUsername">@user</div>
+            <div class="story-player-time" id="playerTime">2 saat önce</div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn btn-secondary btn-icon" id="playerSoundBtn" onclick="togglePlayerSound()" style="background: rgba(0,0,0,0.5); width: 32px; height: 32px;">
+            <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+          </button>
+          <button class="modal-close-btn" onclick="closeStoryPlayer()" style="color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Media View -->
+      <div class="story-player-content" id="playerContentBox">
+        <!-- Next / Prev Click Zones -->
+        <div class="story-nav-btn story-nav-left" onclick="playerPrev()"></div>
+        <div class="story-nav-btn story-nav-right" onclick="playerNext()"></div>
+        
+        <img id="playerImage" src="" style="display: none;" alt="Story Image">
+        <video id="playerVideo" playsinline preload="auto" style="display: none;"></video>
+      </div>
+
+      <!-- Player Footer -->
+      <div class="story-player-footer">
+        <button class="btn btn-secondary" onclick="togglePlayPause()" style="background: rgba(0,0,0,0.6); padding: 6px 12px; font-size: 12px;" id="playPauseBtn">
+          <i class="fa-solid fa-pause"></i> Duraklat
+        </button>
+        <button class="btn btn-primary" onclick="downloadCurrentPlayerStory()" style="padding: 6px 14px; font-size: 12px;">
+          <i class="fa-solid fa-download"></i> Bu Story'i İndir
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Modal 3: Settings & Session Modal -->
+  <div class="modal-backdrop" id="settingsModal">
+    <div class="modal-container" style="max-width: 500px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-gear" style="color: var(--accent-pink);"></i>
+          <span id="settingsModalTitle">Ayarlar & Oturum</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('settingsModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="gap: 14px;">
+        
+        <!-- Tab Switcher: Önbellek & Sıfırlama vs Instagram Oturumu -->
+        <div class="settings-tabs">
+          <button type="button" class="settings-tab-btn active" id="settingsTabCacheBtn" onclick="switchSettingsTab('cache')">
+            <i class="fa-solid fa-broom"></i> Önbellek & Sıfırlama
+          </button>
+          <button type="button" class="settings-tab-btn" id="settingsTabSessionBtn" onclick="switchSettingsTab('session')">
+            <i class="fa-brands fa-instagram"></i> Instagram Oturumu
+          </button>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 1: Cache & Reset Management           -->
+        <!-- ========================================== -->
+        <div id="settingsTabCacheContent" class="settings-tab-content">
+          <!-- Real-time Cache Status Grid -->
+          <div class="cache-status-grid">
+            <div class="cache-status-card">
+              <div class="cache-status-icon">
+                <i class="fa-solid fa-image"></i>
+              </div>
+              <div class="cache-status-info">
+                <span class="cache-status-label">Medya Belleği</span>
+                <span class="cache-status-val" id="cacheMediaCount">0 görsel</span>
+              </div>
+            </div>
+            <div class="cache-status-card">
+              <div class="cache-status-icon blue">
+                <i class="fa-solid fa-database"></i>
+              </div>
+              <div class="cache-status-info">
+                <span class="cache-status-label">API Belleği</span>
+                <span class="cache-status-val" id="cacheApiCount">0 veri</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Cache Reset Action Box -->
+          <div class="cache-action-box">
+            <div class="cache-action-header">
+              <div class="cache-action-icon">
+                <i class="fa-solid fa-arrows-rotate"></i>
+              </div>
+              <div class="cache-action-text">
+                <h4>Önbelleği Temizle & Uygulamayı Sıfırla</h4>
+                <p>
+                  Hafızadaki tüm görsel, hikaye, profil geçici verilerini ve tarayıcı önbelleğini temizler. Sayfa otomatik olarak yenilenir ve uygulama ilk açılış durumuna sıfırlanır.
+                </p>
+              </div>
+            </div>
+
+            <!-- Optional Extra Clean Option -->
+            <div class="cache-options-list">
+              <label class="cache-option-item">
+                <input type="checkbox" id="resetClearHistoryCheck">
+                <span>Son arama geçmişini de temizle</span>
+              </label>
+            </div>
+
+            <!-- Primary Action Button -->
+            <button class="btn btn-warning btn-block" id="clearCacheBtn" onclick="resetAppCache(false)" style="margin-top: 4px;">
+              <i class="fa-solid fa-arrows-rotate"></i> Önbelleği Temizle ve Uygulamayı Sıfırla
+            </button>
+          </div>
+
+          <!-- Full Factory Reset (Advanced) -->
+          <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: var(--radius-md); padding: 13px 15px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="font-size: 12.5px; font-weight: 700; color: #f87171; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Kapsamlı Fabrika Sıfırlaması
+            </div>
+            <p style="font-size: 11.5px; color: var(--text-secondary); line-height: 1.4;">
+              Instagram oturumunuz, tüm arama geçmişiniz, favoriler ve tüm önbellek tamamen silinir.
+            </p>
+            <button class="btn btn-secondary" id="factoryResetBtn" onclick="resetAppCache(true)" style="color: var(--danger); border-color: rgba(239, 68, 68, 0.35); padding: 8px 14px; font-size: 12px; margin-top: 2px; justify-content: center;">
+              <i class="fa-solid fa-trash-can"></i> Tüm Verileri ve Oturumu Sıfırla
+            </button>
+          </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: Instagram Session & Login           -->
+        <!-- ========================================== -->
+        <div id="settingsTabSessionContent" class="settings-tab-content" style="display: none;">
+          
+          <!-- Active Session Card (Shown when logged in) -->
+          <div class="active-session-card" id="activeSessionCard" style="display: none;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 42px; height: 42px; border-radius: 50%; background: var(--ig-grad); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 16px;" id="activeSessionAvatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <div style="font-weight: 700; font-size: 14px; color: #fff; display: flex; align-items: center; gap: 6px;">
+                  <span id="activeSessionUsername">Hesap Bağlı</span>
+                  <span style="font-size: 10px; background: rgba(16, 185, 129, 0.2); color: #34d399; padding: 2px 7px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.4);">Aktif Oturum</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                  Özel oturumunuz aktif. Tüm hikayeler ve gönderiler tam hızda yüklenir.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- In-App Instagram Login Screen Card -->
+          <div class="login-screen-card" id="loginScreenCard">
+            <div class="login-screen-header">
+              <div class="login-screen-icon">
+                <i class="fa-brands fa-instagram"></i>
+              </div>
+              <div class="login-screen-title">
+                <h3>Instagram Giriş Ekranı</h3>
+                <p>Hesabınızla güvenle giriş yapın. Bilgileriniz kaydedilmez, doğrudan güvenli Instagram oturumunuz açılır.</p>
+              </div>
+            </div>
+
+            <!-- Alert / Feedback Box -->
+            <div class="login-alert-box login-alert-error" id="directLoginAlert" style="display: none;">
+              <i class="fa-solid fa-circle-exclamation" id="directLoginAlertIcon"></i>
+              <span id="directLoginAlertText">Hata oluştu</span>
+            </div>
+
+            <!-- Standard Username + Password Form -->
+            <form id="directLoginForm" onsubmit="event.preventDefault(); submitDirectLogin();" style="display: flex; flex-direction: column; gap: 14px;">
+              <div class="login-field-group">
+                <label class="login-field-label" for="directLoginUsername">
+                  <i class="fa-solid fa-user"></i> Kullanıcı Adı, E-posta veya Telefon
+                </label>
+                <div class="login-input-wrap">
+                  <i class="fa-solid fa-at field-icon"></i>
+                  <input 
+                    type="text" 
+                    id="directLoginUsername" 
+                    autocomplete="username" 
+                    placeholder="Instagram kullanıcı adınız" 
+                    class="login-field-input"
+                    required
+                  >
+                </div>
+              </div>
+
+              <div class="login-field-group">
+                <label class="login-field-label" for="directLoginPassword">
+                  <i class="fa-solid fa-lock"></i> Şifre
+                </label>
+                <div class="login-input-wrap">
+                  <i class="fa-solid fa-key field-icon"></i>
+                  <input 
+                    type="password" 
+                    id="directLoginPassword" 
+                    autocomplete="current-password" 
+                    placeholder="Instagram şifreniz" 
+                    class="login-field-input"
+                    style="padding-right: 42px;"
+                    required
+                  >
+                  <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('directLoginPassword', 'loginEyeIcon')" title="Şifreyi Göster/Gizle">
+                    <i class="fa-solid fa-eye" id="loginEyeIcon"></i>
+                  </button>
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-block" id="directLoginSubmitBtn" style="margin-top: 4px;">
+                <i class="fa-solid fa-right-to-bracket"></i> Giriş Yap
+              </button>
+            </form>
+
+            <!-- 2FA Security Code Verification (Revealed dynamically if required) -->
+            <div id="directLogin2faForm" style="display: none; flex-direction: column; gap: 14px;">
+              <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: var(--radius-md); padding: 12px; text-align: center;">
+                <div style="font-size: 13px; font-weight: 700; color: #93c5fd; margin-bottom: 4px;">
+                  <i class="fa-solid fa-shield-halved"></i> İki Faktörlü Doğrulama (2FA)
+                </div>
+                <p style="font-size: 12px; color: var(--text-secondary); line-height: 1.4;">
+                  Instagram hesabınızda 2FA aktif. SMS veya Kimlik Doğrulayıcı uygulamanızdaki 6 haneli güvenlik kodunu girin:
+                </p>
+              </div>
+
+              <div class="login-field-group">
+                <input 
+                  type="text" 
+                  id="directLogin2faCode" 
+                  maxlength="8" 
+                  placeholder="6 Haneli Kod" 
+                  class="login-field-input" 
+                  style="font-size: 20px; letter-spacing: 5px; text-align: center; font-weight: 700; padding: 12px;"
+                  autocomplete="one-time-code"
+                  onkeypress="if(event.key==='Enter') submitDirectLogin2fa();"
+                >
+              </div>
+
+              <div style="display: flex; gap: 8px;">
+                <button class="btn btn-primary" id="directLogin2faSubmitBtn" onclick="submitDirectLogin2fa()" style="flex: 2; justify-content: center; padding: 11px;">
+                  <i class="fa-solid fa-shield-check"></i> Doğrula ve Giriş Yap
+                </button>
+                <button class="btn btn-secondary" onclick="backToDirectLoginForm()" style="flex: 1; justify-content: center; padding: 11px;">
+                  <i class="fa-solid fa-arrow-left"></i> Geri
+                </button>
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="login-divider">veya</div>
+
+            <!-- Standalone Browser Login Option -->
+            <button class="btn btn-secondary" id="openBrowserWindowBtn" onclick="openExternalBrowserLogin()" style="width: 100%; justify-content: center; padding: 10px 16px; font-size: 12.5px; border-radius: var(--radius-md);">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Resmi Instagram Sayfasını Ayrı Pencerede Aç
+            </button>
+          </div>
+
+          <!-- Collapsible Manual Input (Advanced) -->
+          <details style="background: rgba(255, 255, 255, 0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px 16px; font-size: 13px;">
+            <summary style="cursor: pointer; font-weight: 700; color: var(--text-secondary); display: flex; align-items: center; justify-content: space-between;">
+              <span><i class="fa-solid fa-code"></i> Manuel SessionID Girmek İstiyorum (Gelişmiş)</span>
+              <i class="fa-solid fa-chevron-down" style="font-size: 11px;"></i>
+            </summary>
+            <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 10px;">
+              <p style="font-size: 12px; color: var(--text-muted); line-height: 1.4;">
+                F12 Geliştirici Araçları > Application > Cookies > instagram.com altındaki <code>sessionid</code> değerini doğrudan yapıştırabilirsiniz:
+              </p>
+              <div style="display: flex; gap: 8px;">
+                <input 
+                  type="text" 
+                  id="sessionIdInput" 
+                  class="search-input" 
+                  placeholder="Örn: 678912345%3AXyZ987... yapıştırın"
+                  style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px 14px; font-family: monospace; font-size: 13px;"
+                >
+                <button class="btn btn-primary" onclick="saveSessionId()" id="saveSessionBtn">
+                  <i class="fa-solid fa-floppy-disk"></i> Kaydet
+                </button>
+              </div>
+            </div>
+          </details>
+
+          <!-- Verification Status Result -->
+          <div id="sessionTestResult" style="display: none; padding: 12px; border-radius: var(--radius-md); font-size: 13px; font-weight: 600;"></div>
+
+        </div>
+
+      </div>
+
+      <!-- Footer for Cache Tab -->
+      <div class="modal-footer" id="settingsFooterCache">
+        <button class="btn btn-warning" onclick="resetAppCache(false)" id="footerResetCacheBtn">
+          <i class="fa-solid fa-arrows-rotate"></i> Önbelleği Sıfırla
+        </button>
+        <button class="btn btn-secondary" onclick="closeModal('settingsModal')">Kapat</button>
+      </div>
+
+      <!-- Footer for Session Tab -->
+      <div class="modal-footer" id="settingsFooterSession" style="display: none;">
+        <button class="btn btn-secondary" onclick="testCurrentSession()" id="testSessionBtn">
+          <i class="fa-solid fa-satellite-dish"></i> Oturumu Test Et
+        </button>
+        <button class="btn btn-secondary" onclick="clearSessionId()" style="color: var(--danger);" id="clearSessionBtn">
+          <i class="fa-solid fa-trash"></i> Oturumu Kaldır
+        </button>
+        <button class="btn btn-primary" onclick="closeModal('settingsModal')">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 4: Post & Carousel Preview Modal -->
+  <div class="modal-backdrop" id="postPreviewModal">
+    <div class="modal-container" style="max-width: 780px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-image" style="color: var(--accent-pink);"></i>
+          <span id="postModalTitle">Gönderi Detayı</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeModal('postPreviewModal')">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px;">
+        <div class="post-preview-display" style="position: relative; width: 100%; border-radius: var(--radius-md); overflow: hidden; background: #000; display: flex; align-items: center; justify-content: center; min-height: 380px; max-height: 560px;">
+          <!-- Carousel Arrows (if carousel) -->
+          <button class="carousel-arrow prev" id="carouselPrevBtn" onclick="carouselSlide(-1)" style="display: none;"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="carousel-arrow next" id="carouselNextBtn" onclick="carouselSlide(1)" style="display: none;"><i class="fa-solid fa-chevron-right"></i></button>
+          
+          <img id="postModalImg" src="" style="max-width: 100%; max-height: 560px; object-fit: contain; display: none;">
+          <video id="postModalVideo" controls playsinline style="max-width: 100%; max-height: 560px; display: none;"></video>
+          
+          <div id="carouselCounter" style="display: none; position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; color: #fff;"></div>
+        </div>
+
+        <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 13px; color: var(--text-secondary);">
+              <span id="postLikes"><i class="fa-regular fa-heart" style="color: var(--accent-pink);"></i> 0 beğeni</span>
+              <span id="postComments"><i class="fa-regular fa-comment"></i> 0 yorum</span>
+              <span id="postDate" style="color: var(--text-muted);"><i class="fa-regular fa-clock"></i> </span>
+            </div>
+            <a id="postOriginalLink" href="#" target="_blank" rel="noopener noreferrer" style="font-size: 12px; color: var(--accent-pink); text-decoration: none;">
+              <i class="fa-brands fa-instagram"></i> Instagram'da Aç
+            </a>
+          </div>
+          <p id="postCaptionText" style="font-size: 13px; line-height: 1.5; color: var(--text-primary); white-space: pre-wrap; max-height: 120px; overflow-y: auto;"></p>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn btn-success" id="postDownloadBtn" href="#" download>
+          <i class="fa-solid fa-download"></i> Orijinal Medyayı İndir
+        </a>
+        <button class="btn btn-secondary" onclick="closeModal('postPreviewModal')">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 5: Download All Posts Modal -->
+  <div class="modal-backdrop" id="downloadAllPostsModal">
+    <div class="modal-container" style="max-width: 520px;">
+      <div class="modal-header">
+        <div class="modal-title">
+          <i class="fa-solid fa-cloud-arrow-down" style="color: var(--accent-pink);"></i>
+          <span>Tüm Gönderileri İndir (.ZIP)</span>
+        </div>
+        <button class="modal-close-btn" onclick="closeDownloadAllPostsModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body" style="padding: 20px;">
+        <!-- Setup view -->
+        <div id="downloadPostsSetupView">
+          <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 14px 18px; margin-bottom: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--text-secondary);">Hedef Profil:</span>
+              <strong id="dlPostsUsername" style="color: var(--accent-pink);">@kullanici</strong>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+              <span style="font-size: 13px; color: var(--text-secondary);">Toplam Gönderi Sayısı:</span>
+              <span id="dlPostsTotalCount" style="font-weight: 700; color: #fff;">0</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 13px; color: var(--text-secondary);">Şu Ana Kadar Yüklenen:</span>
+              <span id="dlPostsLoadedCount" style="color: var(--text-muted);">0</span>
+            </div>
+          </div>
+
+          <div style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 16px; background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: var(--radius-sm); padding: 10px 14px;">
+            <i class="fa-solid fa-circle-check" style="color: #10b981; margin-right: 6px;"></i>
+            Oturumunuz aktif. Tüm fotoğraflar, videolar ve çoklu albümler (carousel) en yüksek orijinal çözünürlükte toplanıp tek bir ZIP arşivinde indirilecektir.
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
+            <label style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary);">İndirme Kapsamı:</label>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <label style="flex: 1; min-width: 140px; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 12px; cursor: pointer; font-size: 13px;">
+                <input type="radio" name="dlPostsScope" value="all" checked>
+                <span>Tüm Gönderiler</span>
+              </label>
+              <label style="flex: 1; min-width: 140px; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 12px; cursor: pointer; font-size: 13px;">
+                <input type="radio" name="dlPostsScope" value="loaded">
+                <span>Yalnızca Yüklenenler</span>
+              </label>
+            </div>
+          </div>
+
+          <button class="btn btn-success btn-block" id="startDlPostsBtn" onclick="executeDownloadAllPosts()" style="padding: 12px; font-size: 14px; font-weight: 700; justify-content: center;">
+            <i class="fa-solid fa-cloud-arrow-down"></i> ZIP Olarak İndirmeyi Başlat
+          </button>
+        </div>
+
+        <!-- Progress view (shown while collecting and zipping) -->
+        <div id="downloadPostsProgressView" style="display: none; text-align: center; padding: 16px 8px;">
+          <div style="margin-bottom: 16px;">
+            <i class="fa-solid fa-spinner fa-spin fa-2x" style="color: var(--accent-pink);"></i>
+          </div>
+          <h4 id="dlPostsProgressTitle" style="font-size: 15px; margin-bottom: 6px; font-weight: 700;">Gönderiler Taranıyor...</h4>
+          <p id="dlPostsProgressSubtitle" style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px;">Lütfen sayfayı kapatmayın.</p>
+
+          <div style="width: 100%; height: 10px; background: rgba(255,255,255,0.08); border-radius: 5px; overflow: hidden; margin-bottom: 10px;">
+            <div id="dlPostsProgressBar" style="width: 0%; height: 100%; background: linear-gradient(90deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); transition: width 0.3s ease;"></div>
+          </div>
+          <div id="dlPostsProgressPercent" style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">%0</div>
+
+          <button class="btn btn-secondary" onclick="cancelDownloadAllPosts()" style="margin-top: 18px; padding: 6px 18px; font-size: 12px;">
+            İptal Et
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="/js/app.js"></script>
+</body>
+</html>
