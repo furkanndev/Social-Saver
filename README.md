@@ -1,65 +1,98 @@
-# 🌟 Social Saver (v1.0) — Instagram Story & HD Profil Fotoğrafı İndirici
+# Social Saver
 
-![Version](https://img.shields.io/badge/version-v1.0-blue.svg)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python)
-![Flask](https://img.shields.io/badge/Flask-3.x-green?logo=flask)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Framework-Flask%203.x-27272a?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![Architecture](https://img.shields.io/badge/Architecture-Desktop%20%2F%20Embedded%20Web-blue?style=flat-square)](https://github.com/furkanndev/Social-Saver)
+[![Reverse Engineering](https://img.shields.io/badge/Engine-Direct%20CDN%20Stream-4EAA25?style=flat-square)](https://github.com/furkanndev/Social-Saver)
+[![License: MIT](https://img.shields.io/badge/License-MIT-gray?style=flat-square)](LICENSE)
 
-Instagram'daki tüm **açık (public) profillerin** 24 saatlik aktif hikayelerini ve öne çıkan albümlerini **%100 anonim olarak (karşı tarafa "görüldü" gitmeden)** izleyebileceğiniz, tek tek veya topluca (.ZIP) indirebileceğiniz ve profil fotoğraflarını **Full HD (orijinal boyutta)** görüntüleyip kaydedebileceğiniz modern bir masaüstü/web uygulamasıdır.
-
----
-
-## ✨ Özellikler
-
-1. **🔒 %100 Anonim Story Görüntüleme & Kaydetme:**
-   - Hikayeler doğrudan Instagram CDN sunucularından medya akışı olarak çekilir.
-   - Instagram'ın "seen / görüldü" izleme servisine sinyal gönderilmez; hesap sahibi hikayesini izlediğinizi veya indirdiğinizi asla göremez.
-   - Fotoğraf (.JPG) ve video (.MP4) hikayeler orijinal yüksek kalitede oynatılır ve indirilir.
-
-2. **📸 Full HD Profil Fotoğrafı Görüntüleyici:**
-   - Profil fotoğraflarını Instagram'ın sıkıştırmasına maruz kalmadan, ham en yüksek çözünürlükte (1080×1080 Full HD veya daha yüksek) açar.
-   - Dahili zoom & pan modalı ile detayları yakından inceleyebilir, tek tıkla orijinal kalitede indirebilirsiniz.
-
-3. **📦 Tüm Hikayeleri Tek Tıkla İndirme (.ZIP):**
-   - Kullanıcının tüm aktif hikayelerini tek bir tıklamayla arka planda `.zip` arşivi olarak paketler ve cihazınıza indirir.
-
-4. **🎞️ Instagram Tarzı Entegre Story Oynatıcı:**
-   - Üst segmentli ilerleme çubukları (progress bars).
-   - Hikayeler arasında ileri/geri geçiş, duraklatma ve ses açma/kapatma kontrolleri.
-
-5. **⭐ Öne Çıkanlar (Highlights) Desteği:**
-   - Profildeki tüm öne çıkan hikaye albümlerini kapak fotoğraflarıyla listeler.
-   - Albüme tıklandığında içindeki tüm eski hikayeleri getirir ve indirme imkanı sunar.
-
-6. **🧹 Gelişmiş Önbellek & Uygulama Sıfırlama (v1.0):**
-   - Ayarlar menüsü üzerinden sunucu ve istemci tarafındaki tüm geçici medya/API önbelleklerini tek tıkla temizleme.
-   - Gerçek zamanlı önbellek sayaçları ve gerektiğinde arama geçmişi ile birlikte temizleme veya fabrika ayarlarına döndürme seçeneği.
-
-7. **⚡ Son Aramalar & Favoriler:**
-   - Sık takip ettiğiniz profilleri tek tıkla tekrar açabilmeniz için yerel arama geçmişi ve favoriler listesi.
+An anonymous Instagram story, highlight, and original-resolution profile media viewer and exporter. Built with Python and Flask, Social Saver intercepts direct CDN media streams to guarantee zero read receipt beacons (`seen = false`) and provides automated session authentication.
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## Technical Highlights
 
-### Yöntem 1 (En Kolay — Tek Tıkla Başlatma):
-Klasör içerisindeki **`start.bat`** dosyasına çift tıklayın.
+- **Anonymous CDN Streaming:** Direct extraction of high-bitrate media URLs from CDN edge endpoints. Read receipt endpoints are never polled, ensuring viewing sessions remain untracked.
+- **Automated Session Ingestion:** Integrated lightweight browser window (`login_window.py`) that captures authentic session cookies on login and persists them locally to `config.json` with zero manual devtools inspection required.
+- **Bulk Compression Pipeline:** In-memory and streaming packaging of active profile stories into clean `.zip` archives.
+- **Original Resolution Rendering:** Bypasses aggressive client-side downsampling to fetch uncompressed 1080p+ avatars with pan/zoom inspection.
+- **Story Player Component:** In-browser custom player featuring segmented progress bars, pause/resume, audio attenuation, and highlight navigation.
+- **Client Cache Management:** Dedicated local cache pruning mechanisms with real-time byte counters and session isolation.
 
-### Yöntem 2 (Terminal Üzerinden):
-```bash
-python run.py
+---
+
+## Architecture Overview
+
 ```
-Uygulama otomatik olarak yerel sunucuyu ayağa kaldıracak ve varsayılan tarayıcınızda (Edge / Chrome) bağımsız masaüstü pencere modunda **`http://127.0.0.1:5055`** adresini açacaktır.
+Social-Saver/
+├── app.py                  # Flask server, route controllers & static serving
+├── ig_api.py               # Reverse-engineered Instagram web API client
+├── login_window.py         # Automated webview session & cookie interceptor
+├── run.py                  # Standalone application entrypoint (starts server & native window)
+├── start.bat               # Windows single-click launcher
+├── config.example.json     # Configuration template
+├── requirements.txt        # Python dependencies
+└── static/                 # Embedded frontend assets (JS player, styles, icons)
+```
 
 ---
 
-## 🔑 Otomatik Giriş (Tek Tıkla Bağlanma)
+## Installation & Quick Start
 
-Artık hiçbir teknik ayar yapmanıza veya `F12` ile çerez kopyalamanıza gerek yok:
+### Prerequisites
+- Python 3.10 or higher
+- Modern web browser (Chrome, Edge, Firefox)
 
-1. Uygulama arayüzünün sağ üstündeki **"✨ Otomatik Giriş Yap"** butonuna tıklayın.
-2. Açılan resmi Instagram penceresinde hesabınıza giriş yapın (veya zaten açıksa bekleyin).
-3. Giriş yaptığınız anda sistem **sessionID'yi otomatik olarak yakalar**, kaydeder ve pencereyi kendiliğinden kapatır.
-4. Social Saver anında aktif hale gelir ve tüm story'leri sınırsız, reklamsız ve anonim olarak indirebilirsiniz!
+### Manual Setup
 
-> **Güvenlik Notu:** Giriş işlemi doğrudan resmi Instagram Web API'si üzerinden gerçekleşir. Şifreniz hiçbir yerde depolanmaz. Sadece oluşturulan oturum çerezi bilgisayarınızda yerel `config.json` dosyasında saklanır.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/furkanndev/Social-Saver.git
+   cd Social-Saver
+   ```
+
+2. Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   # Windows
+   .\venv\Scripts\activate
+   # Linux / macOS
+   source venv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Launch the application:
+   ```bash
+   python run.py
+   ```
+
+*On Windows, you can also launch directly by double-clicking `start.bat`.*
+
+The application initializes the local Flask server at `http://127.0.0.1:5055` and opens an isolated application window.
+
+---
+
+## Authentication & Privacy Workflow
+
+1. Click **Auto Login** on the application top bar.
+2. Complete standard login inside the official Instagram authentication dialog.
+3. The application intercepts the active `sessionid` and CSRF tokens, writes them securely to local `config.json`, and closes the login viewport automatically.
+4. All media extraction now runs using authenticated sessions.
+
+> **Privacy Notice:** Authentication tokens and cookies are exclusively stored locally on your machine in `config.json`. No credentials or credentials data are transmitted to any external third-party server.
+
+---
+
+## Disclaimer
+
+This software is for personal educational and archival research purposes only. It is not affiliated with, authorized, maintained, sponsored, or endorsed by Instagram, Meta Platforms, Inc., or any of its affiliates. Use responsibly and in accordance with applicable terms of service.
+
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
